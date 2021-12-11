@@ -6,9 +6,9 @@ After=network.target
 User=leo
 Group=leo
 
-WorkingDirectory=/home/leo/all_code/РАБОТА/1.Салон_красоты_kreatiff(02.12.2021)
-Environment="PYTHONPATH=/home/leo/all_code/РАБОТА/1.Салон_красоты_kreatiff(02.12.2021)/"
-ExecStart=/home/leo/all_code/РАБОТА/1.Салон_красоты_kreatiff(02.12.2021)/.venv/bin/python /home/leo/all_code/РАБОТА/1.Салон_красоты_kreatiff(02.12.2021)/main.py
+WorkingDirectory=/home/leo/kreatiff
+Environment="PYTHONPATH=/home/leo/kreatiff/"
+ExecStart=/home/leo/kreatiff/.venv/bin/python /home/leo/kreatiff/main.py
 
 [Install]
 WantedBy=multi-user.target
