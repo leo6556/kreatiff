@@ -2,7 +2,7 @@ import sqlite3 as sq
 from loader import bot, dp
 from aiogram import types
 
-with sq.connect('database.db') as con:
+with sq.connect('DB/database_price.db') as con:
     cur = con.cursor()
     cur.execute('CREATE TABLE IF NOt EXISTS price_man (name TEXT, price TEXT, sms_1 TEXT, sms_2 TEXT)')
     cur.execute('CREATE TABLE IF NOt EXISTS price_ped (name TEXT, price TEXT, sms_1 TEXT, sms_2 TEXT)')
@@ -23,6 +23,7 @@ with sq.connect('database.db') as con:
 
 async def show_price_man():
     read = cur.execute('SELECT name, price FROM price_man').fetchall()
+    print(read)
     return read
 
 async def show_price_ped():
