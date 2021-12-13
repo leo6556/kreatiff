@@ -74,3 +74,7 @@ async def do_point_warning(v):
     cur.execute(f'UPDATE order_b SET sms_1 = "1" WHERE order_num = "{v}"')
     con.commit()
 
+
+
+async def show_right_order_to_del(id):
+    return cur.execute(f'SELECT * FROM order_b WHERE order_num = {id}').fetchall()

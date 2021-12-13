@@ -1,4 +1,3 @@
-import random
 
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
@@ -9,6 +8,10 @@ from states.sighup import *
 from keyboards.inline.panel_state_sighup import *
 from DB.db3_manage import *
 from keyboards.inline.show_right_order import *
+
+from aiogram import types, Dispatcher
+from aiogram.types import ParseMode
+from loader import dp, bot
 
 @dp.message_handler(commands='myorders')
 async def show_orders(message : types.Message):
@@ -35,7 +38,6 @@ async def show_orders(message : types.Message):
 @dp.callback_query_handler(Text(startswith='show_'))
 async def call_right_order(callback : types.CallbackQuery):
     cur_text = callback.message.text
-    print(len(cur_text))
 
     if callback.data == 'show_more':
         text = cur_text + '\n' + '📍Адрес: просп. Просвещения, 15' + '\n' + '📍Ежедневно c 10:00 до 22:00' "\n" + '📍Связь: +7 (911) 138-99-08'
@@ -60,5 +62,21 @@ async def call_right_order(callback : types.CallbackQuery):
     elif callback.data == 'show_del':
         spl = cur_text.split('#')
         order_num = spl[1][1:5]
+
+        data = await show_right_order_to_del(order_num)
         await del_order(order_num)
+        print(data)
+
+        admin = await show_all_admin()
+
+        for j in admin:
+            for i in data:
+                text = [
+                    f'*Клиент отменил заказ* 😌 "{i[2]}" на {i[3]} в {i[4]}',
+                    f'*Мастер:* {i[5]}',
+                    f'*Номер клиента:* {i[6]}',
+                ]
+                await bot.send_message(j, text='\n'.join(text), parse_mode=ParseMode.MARKDOWN)
+
+
         await callback.message.edit_text('Заказ расформирован 😌')
