@@ -4,10 +4,36 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import CommandStart, CommandHelp
 from aiogram.types import ParseMode, InlineKeyboardMarkup, InlineKeyboardButton
 
+from DB.db2_manage import add_in_db_admin, del_in_db_admin
 from keyboards.inline.panel_price import main_panel_price
 from keyboards.inline.panel_state_sighup import main_panel
 from loader import dp, bot
 from states.sighup import Client
+from states.add_admin import Admin
+
+
+@dp.message_handler(commands='stayadmin', state=None)
+async def add_admin(message : types.Message, state : FSMContext):
+    await Admin.name.set()
+    await message.answer('*Отправьте код доступа:*', parse_mode=ParseMode.MARKDOWN)
+
+
+@dp.message_handler(commands='stop_admin')
+async def add_admin(message : types.Message, state : FSMContext):
+    await del_in_db_admin(message.from_user.id)
+    await message.answer('Вы теперь больше не админ')
+
+
+@dp.message_handler(state=Admin.name)
+async def add_adm(message : types.Message, state : FSMContext):
+    passw = message.text
+    if passw == '50200':
+        await add_in_db_admin(message.from_user.id)
+        await message.answer('Поздравляем 🥳 Вы теперь один из админов\n/admin -- панель для админа')
+        await state.finish()
+    else:
+        await message.answer('Вы ввели неверный пароль')
+        await state.finish()
 
 
 @dp.message_handler(CommandStart())
@@ -66,7 +92,6 @@ async def bot_help(message: types.Message):
 async def bot_echo(message: types.Message):
 
     await message.answer('Если хотите записаться в салон красоты, нажмите на команду 👉🏼 "/start"')
-
 
 
 # # Эхо хендлер, куда летят ВСЕ сообщения с указанным состоянием

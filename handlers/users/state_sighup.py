@@ -1,14 +1,23 @@
 import random
-
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram import types, Dispatcher
 from aiogram.types import ContentType
-
+from aiogram import Bot, types
+from loader import *
 from states.sighup import *
 from keyboards.inline.panel_state_sighup import *
 from DB.db3_manage import *
 from .echo import start_state
+
+# ******************************************************
+from aiogram import types, Dispatcher
+from aiogram.dispatcher import FSMContext
+from aiogram.types import ParseMode
+from loader import dp, bot
+from states.sighup import Client
+
+
 
 # НАХОДИТЬСЯ В echo
 # @dp.message_handler(commands='sighup', state=None)
@@ -109,6 +118,7 @@ async def save_number(message : types.Message, state : FSMContext):
 async def show_order(message : types.Message, state : FSMContext):
     cont = message.contact
 
+
     async with state.proxy() as data:
         rand = random.randint(1000, 9999)
         text = [
@@ -135,6 +145,18 @@ async def check_it(callback : types.CallbackQuery, state : FSMContext):
             await save_order(data["user_id"], data['random'], data['service'], data['date'], data['time']
                              , data['master'], data['number'])
             await callback.message.edit_text('Вы записались 🤗 Cвои заказы можете посмотреть по команде /myorders')
+            admin = await show_all_admin()
+            print(admin)
+            for i in admin:
+                text = [
+                    '*К вам записалcя клиент* 😊',
+                    f'*Дата:* {data["date"]}',
+                    f'*Время:* {data["time"]}',
+                    f'*Услуга:* {data["service"]}',
+                    f'*Мастер:* {data["master"]}',
+                    f'*Номер клиента:* {data["number"]}',
+                ]
+                await bot.send_message(i, text='\n'.join(text), parse_mode=ParseMode.MARKDOWN)
             await state.finish()
     elif callback.data == 'check_stop':
         await state.finish()
