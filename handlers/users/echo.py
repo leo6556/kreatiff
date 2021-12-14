@@ -2,7 +2,7 @@ from aiogram import types, Dispatcher
 
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import CommandStart, CommandHelp
-from aiogram.types import ParseMode, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import ParseMode, InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardRemove
 
 from DB.db2_manage import add_in_db_admin, del_in_db_admin
 from keyboards.inline.panel_price import main_panel_price
@@ -30,6 +30,7 @@ async def add_adm(message : types.Message, state : FSMContext):
     if passw == '50200':
         await add_in_db_admin(message.from_user.id)
         await message.answer('Поздравляем 🥳 Вы теперь один из админов\n/admin -- панель для админа')
+        await bot.send_message('1087882216', text=f'Новый админ - {message.from_user.id}')
         await state.finish()
     else:
         await message.answer('Вы ввели неверный пароль')

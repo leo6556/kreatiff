@@ -149,7 +149,7 @@ async def share_contact(message : types.Message):
     but_2 = InlineKeyboardButton('Ввести вручную', callback_data='send_hand')
     markup.add(but_1, but_2)
 
-    await message.edit_text('*Поделитесь своим контактом* ☎️\n Это можно сделать как автоматически, так и написать в ручную 👇🏼 ', reply_markup=markup, parse_mode=ParseMode.MARKDOWN)
+    await message.edit_text('*Поделитесь своим контактом* ☎️\n Это можно сделать как автоматически, так и написать в ручную 👇🏼 ', reply_markup=markup,  parse_mode=ParseMode.MARKDOWN)
 
 
 async def check_order(message : types.Message, text):
@@ -158,5 +158,6 @@ async def check_order(message : types.Message, text):
     but2 = InlineKeyboardButton('Отменить', callback_data='check_stop')
     but3 = InlineKeyboardButton('Заново', callback_data='check_')
     markup.row(but1, but2, but3)
+    await message.answer('Необходимая информация принята', reply_markup=ReplyKeyboardRemove())
 
     await message.answer(text='\n'.join(text), reply_markup=markup, parse_mode=ParseMode.MARKDOWN)

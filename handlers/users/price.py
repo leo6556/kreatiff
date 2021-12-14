@@ -21,7 +21,7 @@ async def shablon_cos(func, func_2, callback, title, nexty, backy):
 # async def start_price(message : types.Message):
 #     await main_panel(message)
 
-
+@dp.callback_query_handler(Text(startswith='pri_'), state='*')
 @dp.callback_query_handler(Text(startswith='pri_'))
 async def show_price(callback : types.CallbackQuery):
 
@@ -125,6 +125,8 @@ async def show_price(callback : types.CallbackQuery):
             text = text + '\n' + f'💈 {i[0]} -- {i[1]}'
         await shablon(callback, text, 'cos_ear', 'panel_cos')
 
+
+@dp.callback_query_handler(Text(startswith='sub_'), state='*')
 @dp.callback_query_handler(Text(startswith='sub_'))
 async def subcategory(callback : types.CallbackQuery):
 
@@ -132,7 +134,7 @@ async def subcategory(callback : types.CallbackQuery):
         await main_panel_bar_w(callback)
         await callback.answer()
 
-
+@dp.callback_query_handler(Text(startswith='next'), state='*')
 @dp.callback_query_handler(Text(startswith='next'))
 async def rewind(callback : types.CallbackQuery):
 
@@ -167,7 +169,7 @@ async def rewind(callback : types.CallbackQuery):
                 text = text + '\n' + f'💈 {i[0]} -- {i[1]}'
             await sec_cat_ped(callback, text)
 
-
+@dp.callback_query_handler(Text(startswith='back'), state='*')
 @dp.callback_query_handler(Text(startswith='back'))
 async def back_man(callback : types.CallbackQuery):
 
