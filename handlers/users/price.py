@@ -181,7 +181,7 @@ async def back_man(callback : types.CallbackQuery):
                                             InlineKeyboardButton("Парикмахерская", callback_data="pri_bar")).row(
             InlineKeyboardButton("Маникюр", callback_data="pri_man"),
             InlineKeyboardButton("Педикюр", callback_data="pri_ped"))
-        await callback.message.edit_text('Выберите категорию', reply_markup=markup)
+        await callback.message.edit_text('*Просмотр цен: *Выберите категорию\n/sighup -- перейти к записи 😊', reply_markup=markup, parse_mode=ParseMode.MARKDOWN)
         await callback.answer()
     elif callback.data == 'back_bar_hall':
         await main_panel_bar_1(callback)

@@ -9,12 +9,12 @@ but1 = InlineKeyboardButton("Косметология", callback_data="pri_cos")
 but2 = InlineKeyboardButton("Парикмахерская", callback_data="pri_bar")
 but3 = InlineKeyboardButton("Маникюр", callback_data="pri_man")
 but4 = InlineKeyboardButton("Педикюр", callback_data="pri_ped")
-# but55 = InlineKeyboardButton('Перейти к записи на приём', callback_data="sighup")
+# but55 = InlineKeyboardButton('Перейти к записи', callback_data="sighup")
 
 markup_main_panel.row(but1, but2).row(but3, but4)
 
 async def main_panel_price(message : types.Message):
-    await message.answer('Выберите категорию', reply_markup=markup_main_panel)
+    await message.answer('*Просмотр цен: *Выберите категорию\n/sighup -- перейти к записи  😊', reply_markup=markup_main_panel, parse_mode=ParseMode.MARKDOWN)
 
 
 # Подкаталоги
