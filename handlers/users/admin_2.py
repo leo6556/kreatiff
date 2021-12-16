@@ -13,6 +13,14 @@ from DB.db_manage import *
 from keyboards.inline.panel_admin_2 import *
 from states.red_price import *
 
+class Change(StatesGroup):
+    prce = State()
+    passw = State()
+
+class Newpoint(StatesGroup):
+    name = State()
+    price = State()
+    end = State()
 
 async def shablon_e(callback : types.CallbackQuery, table, state : FSMContext, pm):
     read = await shablon_show_order(f'{table}')
@@ -56,7 +64,8 @@ async def gg(callback : types.CallbackQuery):
         but1 = InlineKeyboardButton('Добавить админа', callback_data='fake_admin')
         but2 = InlineKeyboardButton('Редактировать каталог услуг', callback_data='red_cat')
         but3 = InlineKeyboardButton('Просмотр ближайших записей', callback_data='letmesee_order')
-        markup.row(but1).row(but3).row(but2)
+        but4 = InlineKeyboardButton('Редактировать прайс', callback_data="edi_price")
+        markup.row(but1).row(but3).row(but2).row(but4)
         await callback.message.edit_text('Выберите нужную функцию ⚙️', reply_markup=markup)
         await callback.answer()
 
@@ -95,7 +104,7 @@ async def delit(callback : types.CallbackQuery, state : FSMContext):
 
 @dp.message_handler(commands='stop_add', state="*")
 async def do_this_shit(message : types.Message, state : FSMContext):
-    await message.answer('Добавление отменено')
+    await message.answer('Редактирование отменено\n\n/admin -- панель админа')
     await state.finish()
 
 @dp.callback_query_handler(Text(startswith='add'), state=None)
@@ -183,7 +192,7 @@ async def letmesee(callback : types.CallbackQuery):
             await callback.message.answer(text='\n'.join(text), reply_markup=await markup_for_warning(i),
                                           parse_mode=ParseMode.MARKDOWN)
     else:
-        await callback.message.edit_text('На ближайшие 2 дня нет записей')
+        await callback.message.edit_text('На ближайшие 2 дня нет записей\n/admin -- вернуться в панель админа')
 
 
 @dp.callback_query_handler(Text(startswith='warn'))
@@ -192,3 +201,134 @@ async def do_warning(callback : types.CallbackQuery):
     await bot.send_message(chat_id=d[1], text=f'Надпоминаем ☺ у вас  запись в салон красоты на {d[3]} \n/myorders -- посмотреть свои заказы')
     await do_point_warning(d[2])
     await callback.message.edit_text('Клиенту отправлено надпоминание!')
+
+
+# ********************************************УДАЛЕНИЕ\ДОБАВЛЕНИЕ\РЕДАКТИРОВАНИЕ ПРАЙСА
+
+@dp.callback_query_handler(Text(startswith='edi_'))
+async def edit_price(callback : types.CallbackQuery):
+    await edit_price_panel(callback)
+
+@dp.callback_query_handler(Text(startswith='edit_main'))
+async def edit_price(callback : types.CallbackQuery):
+    b = callback.data.split('_')
+    if b[2] == 'add':
+        v1 = 'в которую нужно добавить запись'
+    elif b[2] == 'del':
+        v1 = 'из которой нужно удалить запись '
+    elif b[2] == 'cha':
+        v1 = ',в которой нужно поменять цену'
+    await edit_main_panel_price(callback, v1, b[2])
+
+@dp.callback_query_handler(Text(startswith='edit_'), state='*')
+async def edit_price_two(callback : types.CallbackQuery, state : FSMContext):
+    await state.finish()
+
+    data = callback.data
+    v1 = data.split('_')
+
+    if data[:8] == 'edit_cos':
+        await edit_main_panel_cos(callback, v1[-1])
+    elif data[:8] == 'edit_bar':
+        await edit_main_panel_bar_1(callback, v1[-1])
+    elif data[:11] == 'edit_hall_w':
+        await edit_main_panel_bar_w(callback, v1[-1])
+
+    if data == 'edit_back_1':
+        markup = InlineKeyboardMarkup()
+        but1 = InlineKeyboardButton('Добавить админа', callback_data='fake_admin')
+        but2 = InlineKeyboardButton('Редактировать каталог услуг', callback_data='red_cat')
+        but3 = InlineKeyboardButton('Просмотр ближайших записей', callback_data='letmesee_order')
+        but4 = InlineKeyboardButton('Редактировать прайс', callback_data="edi_price")
+        markup.row(but1).row(but3).row(but2).row(but4)
+        await callback.message.edit_text('Выберите нужную функцию ⚙️', reply_markup=markup)
+        await callback.answer()
+
+    if data == 'edit_back_2_cha':
+        v1 = ',в которой нужно поменять цену'
+        v2 = 'cha'
+        await edit_main_panel_price(callback, v1, v2)
+    elif data == 'edit_back_2_add':
+        v1 = 'в которую нужно добавить запись'
+        v2 = 'add'
+        await edit_main_panel_price(callback, v1, v2)
+    elif data == 'edit_back_2_del':
+        v1 = 'из которой нужно удалить запись '
+        v2 = 'del'
+        await edit_main_panel_price(callback, v1, v2)
+
+# **********************************Удаление
+@dp.callback_query_handler(Text(startswith='make_del'))
+async def edit_price_two(callback : types.CallbackQuery):
+    data = callback.data
+    await edit_del_shablon(callback, data)
+
+@dp.callback_query_handler(Text(startswith='enel'))
+async def edit_price_two(callback : types.CallbackQuery):
+    # print(callback.data)
+    data = callback.data.split('_')
+    v2 = data[-1]
+    v1 = data[1:-1]
+    # print(v1)
+    await edit_end_del(v1, v2)
+    await callback.message.edit_text('Услуга удалена из прайса 💁')
+
+# ********************************Редактирование
+@dp.callback_query_handler(Text(startswith='make_cha'), state = None)
+async def edit_price_two(callback : types.CallbackQuery, state : FSMContext):
+    data = callback.data
+    await edit_cha_shablon(callback, data)
+    await Change.prce.set()
+
+@dp.callback_query_handler(Text(startswith='chpr'), state=Change.prce)
+async def edit_price_two(callback : types.CallbackQuery, state : FSMContext):
+    await callback.message.edit_text('Введите новую цену цифрами\n\n/stop_add -- отменить добавление')
+    async with state.proxy() as data:
+        data['data'] = callback.data
+    await Change.next()
+
+@dp.message_handler(state=Change.passw)
+async def make(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        dat = data['data']
+    price = message.text
+    if price:
+        data = dat.split('_')
+        v2 = data[-1]
+        v1 = data[1:-1]
+        print(v1)
+        await edit_cha_end(v1, v2, price)
+        await message.answer('Цена в прайсе обновлена 💁\n\n/admin -- панель админа')
+        await state.finish()
+    else:
+        await state.finish()
+
+
+
+# ***********************Добавление пункта в прайс
+
+@dp.callback_query_handler(Text(startswith='make_add'), state = None)
+async def edit_price_two(callback : types.CallbackQuery, state : FSMContext):
+    await callback.message.edit_text('Введите название новой услуги для прайса\n\n/stop_add -- отменить добавление')
+    await Newpoint.name.set()
+    async with state.proxy() as data:
+        data['data'] = callback.data
+
+@dp.message_handler(state=Newpoint.name)
+async def doit(message : types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['name'] = message.text
+    await message.answer('Теперь укажите цену цифрами\n\n/stop_add -- отменить добавление')
+    await Newpoint.next()
+
+@dp.message_handler(state=Newpoint.price)
+async def doit(message:types.Message, state:FSMContext):
+    async with state.proxy() as data:
+        data['price'] = message.text
+    v1 = data['data']
+    await edit_add_shablon(v1, data['name'], data['price'])
+    await message.answer('Услуга добавлена в прайс')
+    await state.finish()
+
+
+
