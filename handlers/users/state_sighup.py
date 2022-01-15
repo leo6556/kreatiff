@@ -148,6 +148,7 @@ async def check_it(callback : types.CallbackQuery, state : FSMContext):
             await callback.message.edit_text('Вы записались 🤗 Cвои заказы можете посмотреть по команде /myorders')
             admin = await show_all_admin()
             print(admin)
+            await state.finish()
             for i in admin:
                 text = [
                     '*К вам записалcя клиент* 😊',
@@ -158,7 +159,7 @@ async def check_it(callback : types.CallbackQuery, state : FSMContext):
                     f'*Номер клиента:* {data["number"]}',
                 ]
                 await bot.send_message(i, text='\n'.join(text), parse_mode=ParseMode.MARKDOWN)
-            await state.finish()
+
     elif callback.data == 'check_stop':
         await state.finish()
         await callback.message.edit_text('Заказ не сформирован 😌 экран приветствия /start')
